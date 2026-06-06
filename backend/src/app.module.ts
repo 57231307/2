@@ -9,6 +9,7 @@ import { configuration } from './core/config/configuration';
 import { DatabaseModule } from './core/database/database.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { SystemModule } from './modules/system/system.module';
+import { BaseDataModule } from './modules/base-data/base-data.module';
 
 @Module({
   imports: [
@@ -88,6 +89,7 @@ import { SystemModule } from './modules/system/system.module';
     DatabaseModule,
     AuthModule,
     SystemModule,
+    BaseDataModule,
   ],
 })
 export class AppModule {}
