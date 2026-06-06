@@ -9,11 +9,6 @@ import { configuration } from './core/config/configuration';
 import { DatabaseModule } from './core/database/database.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { SystemModule } from './modules/system/system.module';
-import { BaseDataModule } from './modules/base-data/base-data.module';
-import { SalesModule } from './modules/sales/sales.module';
-import { PurchaseModule } from './modules/purchase/purchase.module';
-import { InventoryModule } from './modules/inventory/inventory.module';
-import { FinanceModule } from './modules/finance/finance.module';
 
 @Module({
   imports: [
@@ -21,7 +16,7 @@ import { FinanceModule } from './modules/finance/finance.module';
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
-      envFilePath: ['.env', '.env.local'],
+      envFilePath: ['.env', '.env.local', '../infra/docker/.env'],
     }),
 
     // 日志模块
@@ -59,11 +54,11 @@ import { FinanceModule } from './modules/finance/finance.module';
     TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
-        host: configService.get('DATABASE_HOST', 'localhost'),
-        port: configService.get('DATABASE_PORT', 5432),
-        username: configService.get('DATABASE_USER', 'fabric_erp'),
-        password: configService.get('DATABASE_PASSWORD', 'password'),
-        database: configService.get('DATABASE_NAME', 'fabric_erp_dev'),
+        host: configService.get('POSTGRES_HOST', 'localhost'),
+        port: configService.get('POSTGRES_PORT', 5432),
+        username: configService.get('POSTGRES_USER', 'fabric_erp'),
+        password: configService.get('POSTGRES_PASSWORD', 'fabric_erp_password'),
+        database: configService.get('POSTGRES_DB', 'fabric_erp_dev'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: configService.get('NODE_ENV') === 'development',
         logging: configService.get('NODE_ENV') === 'development',
@@ -89,15 +84,10 @@ import { FinanceModule } from './modules/finance/finance.module';
     // 事件驱动模块
     EventEmitterModule.forRoot(),
 
-    // 业务模块
+    // 核心模块
     DatabaseModule,
     AuthModule,
     SystemModule,
-    BaseDataModule,
-    SalesModule,
-    PurchaseModule,
-    InventoryModule,
-    FinanceModule,
   ],
 })
 export class AppModule {}
