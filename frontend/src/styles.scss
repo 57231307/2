@@ -1,0 +1,53 @@
+// Tailwind CSS imports
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+// Custom base styles
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+}
+
+// Global styles
+* {
+  box-sizing: border-box;
+}
+
+// Component styles
+.btn {
+  @apply px-4 py-2 rounded font-medium transition-colors;
+}
+
+.btn-primary {
+  @apply bg-blue-600 text-white hover:bg-blue-700;
+}
+
+.btn-secondary {
+  @apply bg-gray-200 text-gray-800 hover:bg-gray-300;
+}
+
+// Form styles
+.form-input {
+  @apply w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+
+// Table styles
+.table {
+  @apply w-full border-collapse;
+}
+
+.table th {
+  @apply px-4 py-2 text-left font-semibold bg-gray-50 border-b;
+}
+
+.table td {
+  @apply px-4 py-2 border-b;
+}
+
+.table tr:hover {
+  @apply bg-gray-50;
+}
