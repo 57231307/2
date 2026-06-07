@@ -64,6 +64,10 @@ export const routes: Routes = [
       {
         path: 'color-formula',
         loadChildren: () => import('./features/color-formula/color-formula.routes').then(m => m.COLOR_FORMULA_ROUTES)
+      },
+      {
+        path: 'system',
+        loadChildren: () => import('./features/system/system.routes').then(m => m.SYSTEM_ROUTES)
       }
     ]
   },

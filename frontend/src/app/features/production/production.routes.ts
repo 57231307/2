@@ -84,4 +84,67 @@ export const PRODUCTION_ROUTES: Routes = [
       },
     ],
   },
+  // 工艺路线
+  {
+    path: 'routes',
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./pages/process-route-list/process-route-list.component').then(m => m.ProcessRouteListComponent),
+        title: '工艺路线',
+      },
+      {
+        path: 'new',
+        loadComponent: () => import('./pages/process-route-form/process-route-form.component').then(m => m.ProcessRouteFormComponent),
+        title: '新建工艺路线',
+      },
+      {
+        path: ':id',
+        loadComponent: () => import('./pages/process-route-form/process-route-form.component').then(m => m.ProcessRouteFormComponent),
+        title: '工艺路线详情',
+      },
+      {
+        path: ':id/edit',
+        loadComponent: () => import('./pages/process-route-form/process-route-form.component').then(m => m.ProcessRouteFormComponent),
+        title: '编辑工艺路线',
+      },
+    ],
+  },
+  // 派工单
+  {
+    path: 'dispatches',
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./pages/dispatch-list/dispatch-list.component').then(m => m.DispatchListComponent),
+        title: '派工单',
+      },
+      {
+        path: 'new',
+        loadComponent: () => import('./pages/dispatch-form/dispatch-form.component').then(m => m.DispatchFormComponent),
+        title: '新建派工单',
+      },
+      {
+        path: ':id',
+        loadComponent: () => import('./pages/dispatch-detail/dispatch-detail.component').then(m => m.DispatchDetailComponent),
+        title: '派工单详情',
+      },
+    ],
+  },
+  // 工序汇报
+  {
+    path: 'report-list',
+    loadComponent: () => import('./pages/report-list/report-list.component').then(m => m.ReportListComponent),
+    title: '工序汇报管理'
+  },
+  {
+    path: 'report-list/create',
+    loadComponent: () => import('./pages/report-form/report-form.component').then(m => m.ReportFormComponent),
+    title: '新建工序汇报'
+  },
+  {
+    path: 'report-list/:id',
+    loadComponent: () => import('./pages/report-form/report-form.component').then(m => m.ReportFormComponent),
+    title: '工序汇报详情'
+  },
 ];

@@ -32,6 +32,21 @@ export const FINANCE_ROUTES: Routes = [
     ]
   },
   {
+    path: 'ar-aging',
+    loadComponent: () => import('./pages/ar-aging/ar-aging.component').then(m => m.ArAgingComponent),
+    title: '应收款账龄分析'
+  },
+  {
+    path: 'ap-aging',
+    loadComponent: () => import('./pages/ap-aging/ap-aging.component').then(m => m.ApAgingComponent),
+    title: '应付款账龄分析'
+  },
+  {
+    path: 'cost-accounting',
+    loadComponent: () => import('./pages/cost-accounting/cost-accounting.component').then(m => m.CostAccountingComponent),
+    title: '成本核算'
+  },
+  {
     path: 'payables',
     children: [
       {

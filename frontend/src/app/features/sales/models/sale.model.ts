@@ -21,6 +21,14 @@ export enum ReturnStatus {
   已拒绝 = 'rejected',
 }
 
+// 报价单状态枚举
+export enum QuotationStatus {
+  草稿 = 'draft',
+  已确认 = 'confirmed',
+  已转订单 = 'converted',
+  已过期 = 'expired',
+}
+
 // 销售订单模型
 export interface SaleOrder {
   id: string;
@@ -158,4 +166,46 @@ export interface ReturnQueryParams {
   pageSize: number;
   keyword?: string;
   status?: ReturnStatus;
+}
+
+// 报价单模型
+export interface SaleQuotation {
+  id: string;
+  quotationNo: string;
+  customerId: string;
+  customerName: string;
+  quotationDate: Date;
+  validUntil: Date;
+  status: QuotationStatus;
+  totalAmount: number;
+  discountRate: number;
+  finalAmount: number;
+  salespersonId?: string;
+  remark?: string;
+  items: SaleQuotationItem[];
+}
+
+// 报价单明细模型
+export interface SaleQuotationItem {
+  id: string;
+  productId: string;
+  productName: string;
+  colorVariantId: string;
+  colorCode: string;
+  colorName: string;
+  quantity: number;
+  unit: string;
+  unitPrice: number;
+  amount: number;
+}
+
+// 报价单查询参数
+export interface QuotationQueryParams {
+  page: number;
+  pageSize: number;
+  keyword?: string;
+  customerId?: string;
+  status?: QuotationStatus;
+  startDate?: Date;
+  endDate?: Date;
 }

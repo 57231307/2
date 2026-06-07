@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, Index } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, Index, OneToMany } from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity';
+import { CustomerContact } from './customer-contact.entity';
 
 export enum CustomerType {
   NORMAL = 'NORMAL',
@@ -68,4 +69,10 @@ export class Customer extends BaseEntity {
 
   @Column({ type: 'text', nullable: true })
   remark: string;
+
+  /**
+   * 客户联系人列表
+   */
+  @OneToMany(() => CustomerContact, (contact) => contact.customer)
+  contacts: CustomerContact[];
 }

@@ -6,3 +6,5 @@ export { SaleOrderItem } from './sale-order-item.entity';
 export { DeliveryNote } from './delivery-note.entity';
 export { DeliveryNoteItem } from './delivery-note-item.entity';
 export { SaleReturn } from './sale-return.entity';
+export { SaleQuotation } from './sale-quotation.entity';
+export { SaleQuotationItem } from './sale-quotation-item.entity';

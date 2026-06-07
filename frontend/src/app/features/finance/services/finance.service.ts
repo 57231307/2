@@ -100,4 +100,75 @@ export class FinanceService {
   deletePayment(id: string): Observable<void> {
     return this.api.delete<void>(`${this.basePath}/payments/${id}`);
   }
+
+  // 应收款账龄分析
+  getArAgingReport(customerId?: string): Observable<any> {
+    if (customerId) {
+      return this.api.get<any>(`${this.basePath}/account-receivables/aging-report`, { params: { customerId } });
+    }
+    return this.api.get<any>(`${this.basePath}/account-receivables/aging-report`);
+  }
+
+  getArOverdueAlerts(): Observable<any> {
+    return this.api.get<any>(`${this.basePath}/account-receivables/overdue-alerts`);
+  }
+
+  // 应付款账龄分析
+  getApAgingReport(supplierId?: string): Observable<any> {
+    if (supplierId) {
+      return this.api.get<any>(`${this.basePath}/account-payables/aging-report`, { params: { supplierId } });
+    }
+    return this.api.get<any>(`${this.basePath}/account-payables/aging-report`);
+  }
+
+  getApOverdueAlerts(): Observable<any> {
+    return this.api.get<any>(`${this.basePath}/account-payables/overdue-alerts`);
+  }
+
+  // 成本核算
+  calculateActualCost(orderId: string): Observable<any> {
+    return this.api.post<any>(`${this.basePath}/cost-accounting/calculate`, { orderId });
+  }
+
+  getCostVariance(orderId: string): Observable<any> {
+    return this.api.get<any>(`${this.basePath}/cost-accounting/variance/${orderId}`);
+  }
+
+  getCostReport(productionOrderId: string): Observable<any> {
+    return this.api.get<any>(`${this.basePath}/cost-accounting/report/${productionOrderId}`);
+  }
+
+  // 成本差异分析
+  getCostVarianceList(params: any): Observable<any> {
+    return this.api.get<any>(`${this.basePath}/cost-variances`, { params });
+  }
+
+  getCostVarianceById(id: string): Observable<any> {
+    return this.api.get<any>(`${this.basePath}/cost-variances/${id}`);
+  }
+
+  createCostVariance(data: any): Observable<any> {
+    return this.api.post<any>(`${this.basePath}/cost-variances`, data);
+  }
+
+  updateCostVariance(id: string, data: any): Observable<any> {
+    return this.api.put<any>(`${this.basePath}/cost-variances/${id}`, data);
+  }
+
+  deleteCostVariance(id: string): Observable<void> {
+    return this.api.delete<void>(`${this.basePath}/cost-variances/${id}`);
+  }
+
+  // 财务报表
+  getProfitLossReport(startDate: string, endDate: string): Observable<any> {
+    return this.api.get<any>(`${this.basePath}/financial-reports/profit-loss`, { params: { startDate, endDate } });
+  }
+
+  getBalanceSheetReport(asOfDate: string): Observable<any> {
+    return this.api.get<any>(`${this.basePath}/financial-reports/balance-sheet`, { params: { asOfDate } });
+  }
+
+  getCashFlowReport(startDate: string, endDate: string): Observable<any> {
+    return this.api.get<any>(`${this.basePath}/financial-reports/cash-flow`, { params: { startDate, endDate } });
+  }
 }

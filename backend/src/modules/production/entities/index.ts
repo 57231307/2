@@ -4,3 +4,7 @@ export * from './material-requisition.entity';
 export * from './material-requisition-item.entity';
 export * from './production-receipt.entity';
 export * from './production-receipt-item.entity';
+export * from './process-route.entity';
+export * from './process-step.entity';
+export * from './work-order-dispatch.entity';
+export * from './process-report.entity';

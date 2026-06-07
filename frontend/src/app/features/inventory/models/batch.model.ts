@@ -1,4 +1,4 @@
-import { BatchStatus, QualityStatus } from '../../shared/enums/batch.enum';
+import { BatchStatus, QualityStatus } from '../../../shared/enums/batch.enum';
 
 export interface InventoryBatch {
   id: string;

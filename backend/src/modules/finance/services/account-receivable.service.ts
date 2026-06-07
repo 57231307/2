@@ -216,4 +216,158 @@ export class AccountReceivableService {
     const seq = String(count + 1).padStart(4, '0');
     return `${prefix}${seq}`;
   }
+
+  /**
+   * 获取应收款账龄报表
+   * @param customerId 可选的客户ID筛选
+   * @returns 账龄分析报表数据
+   */
+  async getAgingReport(customerId?: string): Promise<{
+    总金额: number;
+    账龄区间: Array<{ 区间: string; 金额: number; 占比: number; 笔数: number }>;
+    客户分布: Array<{ 客户名称: string; 金额: number; 占比: number }>;
+  }> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // 构建查询条件
+    const whereConditions: FindOptionsWhere<AccountReceivable> = {
+      status: ArApStatus.PENDING,
+    };
+    if (customerId) {
+      whereConditions.customerId = customerId;
+    }
+
+    // 查询所有未结清的应收款
+    const receivables = await this.receivableRepository.find({
+      where: whereConditions,
+    });
+
+    // 计算总金额
+    const 总金额 = receivables.reduce((sum, r) => sum + Number(r.balance), 0);
+
+    // 账龄区间统计
+    const 账龄区间: Array<{ 区间: string; 金额: number; 占比: number; 笔数: number }> = [
+      { 区间: '0-30天', 金额: 0, 占比: 0, 笔数: 0 },
+      { 区间: '31-60天', 金额: 0, 占比: 0, 笔数: 0 },
+      { 区间: '61-90天', 金额: 0, 占比: 0, 笔数: 0 },
+      { 区间: '90天以上', 金额: 0, 占比: 0, 笔数: 0 },
+    ];
+
+    receivables.forEach((r) => {
+      const dueDate = new Date(r.dueDate);
+      dueDate.setHours(0, 0, 0, 0);
+      const daysPastDue = Math.floor((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
+
+      const balance = Number(r.balance);
+      let index: number;
+
+      if (daysPastDue <= 0) {
+        index = 0; // 0-30天（未到期或刚到期）
+      } else if (daysPastDue <= 30) {
+        index = 0; // 0-30天
+      } else if (daysPastDue <= 60) {
+        index = 1; // 31-60天
+      } else if (daysPastDue <= 90) {
+        index = 2; // 61-90天
+      } else {
+        index = 3; // 90天以上
+      }
+
+      账龄区间[index].金额 += balance;
+      账龄区间[index].笔数 += 1;
+    });
+
+    // 计算占比
+    账龄区间.forEach((item) => {
+      item.占比 = 总金额 > 0 ? Math.round((item.金额 / 总金额) * 10000) / 100 : 0;
+    });
+
+    // 客户分布统计
+    const customerMap = new Map<string, { 金额: number; 名称: string }>();
+    receivables.forEach((r) => {
+      const current = customerMap.get(r.customerId) || { 金额: 0, 名称: r.customerName };
+      current.金额 += Number(r.balance);
+      customerMap.set(r.customerId, current);
+    });
+
+    const 客户分布 = Array.from(customerMap.entries())
+      .map(([id, data]) => ({
+        客户名称: data.名称,
+        金额: data.金额,
+        占比: 总金额 > 0 ? Math.round((data.金额 / 总金额) * 10000) / 100 : 0,
+      }))
+      .sort((a, b) => b.金额 - a.金额);
+
+    return {
+      总金额,
+      账龄区间,
+      客户分布,
+    };
+  }
+
+  /**
+   * 获取逾期预警列表
+   * @returns 逾期应收款预警信息
+   */
+  async getOverdueAlerts(): Promise<Array<{
+    id: string;
+    documentNo: string;
+    customerName: string;
+    amount: number;
+    balance: number;
+    dueDate: Date;
+    overdueDays: number;
+    severity: 'warning' | 'danger' | 'critical';
+  }>> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // 查询所有未结清的应收款
+    const receivables = await this.receivableRepository.find({
+      where: { status: ArApStatus.PENDING },
+      order: { dueDate: 'ASC' },
+    });
+
+    const alerts: Array<{
+      id: string;
+      documentNo: string;
+      customerName: string;
+      amount: number;
+      balance: number;
+      dueDate: Date;
+      overdueDays: number;
+      severity: 'warning' | 'danger' | 'critical';
+    }> = [];
+
+    receivables.forEach((r) => {
+      const dueDate = new Date(r.dueDate);
+      dueDate.setHours(0, 0, 0, 0);
+      const daysPastDue = Math.floor((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
+
+      if (daysPastDue > 0) {
+        let severity: 'warning' | 'danger' | 'critical';
+        if (daysPastDue > 90) {
+          severity = 'critical';
+        } else if (daysPastDue > 60) {
+          severity = 'danger';
+        } else {
+          severity = 'warning';
+        }
+
+        alerts.push({
+          id: r.id,
+          documentNo: r.documentNo,
+          customerName: r.customerName,
+          amount: Number(r.amount),
+          balance: Number(r.balance),
+          dueDate: r.dueDate,
+          overdueDays: daysPastDue,
+          severity,
+        });
+      }
+    });
+
+    return alerts;
+  }
 }

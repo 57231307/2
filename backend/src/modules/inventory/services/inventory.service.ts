@@ -1,16 +1,18 @@
 import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like, In } from 'typeorm';
-import { format } from 'date-fns';
+import { Repository, Like, In, LessThanOrEqual, MoreThanOrEqual, Between } from 'typeorm';
+import { format, addDays } from 'date-fns';
 import { Warehouse, WarehouseStatus } from '../entities/warehouse.entity';
 import { InventoryBatch } from '../entities/inventory-batch.entity';
 import { BatchSourceType } from '../enums/batch-source-type.enum';
 import { BatchStatus } from '../enums/batch-status.enum';
 import { QualityStatus } from '../enums/quality-status.enum';
+import { Product } from '../../product/entities/product.entity';
 import { CreateWarehouseDto, UpdateWarehouseDto, QueryWarehouseDto } from '../dto/warehouse.dto';
 import { CreateBatchDto, UpdateBatchDto, QueryBatchDto } from '../dto/inventory-batch.dto';
 import { InboundDto, InboundResultDto } from '../dto/inbound.dto';
 import { OutboundDto, OutboundResultDto } from '../dto/outbound.dto';
+import { InventoryAlertItemDto, AlertSummaryDto } from '../dto/inventory-alert.dto';
 
 /**
  * 仓库服务
@@ -104,6 +106,8 @@ export class BatchService {
     private batchRepository: Repository<InventoryBatch>,
     @InjectRepository(Warehouse)
     private warehouseRepository: Repository<Warehouse>,
+    @InjectRepository(Product)
+    private productRepository: Repository<Product>,
   ) {}
 
   /**
@@ -466,6 +470,208 @@ export class BatchService {
       },
       // 去向追溯（后续扩展）
       destinationTrace: [],
+    };
+  }
+
+  // ========== 库存预警方法 ==========
+
+  /**
+   * 获取低库存预警列表
+   * 查询当前库存低于安全库存的产品批次
+   */
+  async getLowStockAlerts(warehouseId?: string): Promise<InventoryAlertItemDto[]> {
+    // 查询所有有效批次，按产品+颜色汇总
+    const queryBuilder = this.batchRepository
+      .createQueryBuilder('batch')
+      .leftJoinAndSelect('batch.warehouseId', 'warehouse')
+      .leftJoin('batch.productId', 'product');
+
+    if (warehouseId) {
+      queryBuilder.andWhere('batch.warehouse_id = :warehouseId', { warehouseId });
+    }
+
+    // 只查询活跃状态的批次
+    queryBuilder.andWhere('batch.status = :status', { status: BatchStatus.ACTIVE });
+
+    const batches = await queryBuilder.getMany();
+
+    // 按产品和颜色变体汇总库存
+    const inventoryMap = new Map<string, { productId: string; colorVariantId: string; quantity: number; productName: string; colorCode: string; colorName: string; safeStock: number }>();
+
+    for (const batch of batches) {
+      const key = `${batch.productId}-${batch.colorVariantId || 'default'}`;
+      const existing = inventoryMap.get(key);
+      if (existing) {
+        existing.quantity += Number(batch.quantity);
+      } else {
+        // 获取产品信息
+        const product = await this.productRepository.findOne({ where: { id: batch.productId } });
+        inventoryMap.set(key, {
+          productId: batch.productId,
+          colorVariantId: batch.colorVariantId,
+          quantity: Number(batch.quantity),
+          productName: product?.name || '',
+          colorCode: '',
+          colorName: '',
+          safeStock: product?.safeStock ? Number(product.safeStock) : 0,
+        });
+      }
+    }
+
+    // 生成预警列表
+    const alerts: InventoryAlertItemDto[] = [];
+    for (const [key, item] of inventoryMap) {
+      if (item.safeStock > 0 && item.quantity < item.safeStock) {
+        alerts.push({
+          batchId: '',
+          batchNo: '',
+          rollNo: '',
+          warehouseId: warehouseId || '',
+          warehouseName: '',
+          productId: item.productId,
+          productName: item.productName,
+          colorVariantId: item.colorVariantId,
+          colorCode: item.colorCode,
+          colorName: item.colorName,
+          currentQuantity: item.quantity,
+          threshold: item.safeStock,
+          diff: item.safeStock - item.quantity,
+        });
+      }
+    }
+
+    return alerts;
+  }
+
+  /**
+   * 获取超储预警列表
+   * 查询当前库存高于最高库存的产品批次
+   */
+  async getOverStockAlerts(warehouseId?: string): Promise<InventoryAlertItemDto[]> {
+    // 查询所有有效批次，按产品+颜色汇总
+    const queryBuilder = this.batchRepository
+      .createQueryBuilder('batch')
+      .leftJoinAndSelect('batch.warehouseId', 'warehouse');
+
+    if (warehouseId) {
+      queryBuilder.andWhere('batch.warehouse_id = :warehouseId', { warehouseId });
+    }
+
+    // 只查询活跃状态的批次
+    queryBuilder.andWhere('batch.status = :status', { status: BatchStatus.ACTIVE });
+
+    const batches = await queryBuilder.getMany();
+
+    // 按产品和颜色变体汇总库存
+    const inventoryMap = new Map<string, { productId: string; colorVariantId: string; quantity: number; productName: string; colorCode: string; colorName: string; maxStock: number }>();
+
+    for (const batch of batches) {
+      const key = `${batch.productId}-${batch.colorVariantId || 'default'}`;
+      const existing = inventoryMap.get(key);
+      if (existing) {
+        existing.quantity += Number(batch.quantity);
+      } else {
+        // 获取产品信息
+        const product = await this.productRepository.findOne({ where: { id: batch.productId } });
+        inventoryMap.set(key, {
+          productId: batch.productId,
+          colorVariantId: batch.colorVariantId,
+          quantity: Number(batch.quantity),
+          productName: product?.name || '',
+          colorCode: '',
+          colorName: '',
+          maxStock: product?.maxStock ? Number(product.maxStock) : 0,
+        });
+      }
+    }
+
+    // 生成预警列表
+    const alerts: InventoryAlertItemDto[] = [];
+    for (const [key, item] of inventoryMap) {
+      if (item.maxStock > 0 && item.quantity > item.maxStock) {
+        alerts.push({
+          batchId: '',
+          batchNo: '',
+          rollNo: '',
+          warehouseId: warehouseId || '',
+          warehouseName: '',
+          productId: item.productId,
+          productName: item.productName,
+          colorVariantId: item.colorVariantId,
+          colorCode: item.colorCode,
+          colorName: item.colorName,
+          currentQuantity: item.quantity,
+          threshold: item.maxStock,
+          diff: item.quantity - item.maxStock,
+        });
+      }
+    }
+
+    return alerts;
+  }
+
+  /**
+   * 获取效期预警列表
+   * 查询30天内即将到期的批次
+   */
+  async getExpiryAlerts(warehouseId?: string): Promise<InventoryAlertItemDto[]> {
+    const today = new Date();
+    const thirtyDaysLater = addDays(today, 30);
+
+    const queryBuilder = this.batchRepository
+      .createQueryBuilder('batch')
+      .leftJoinAndSelect('batch.warehouseId', 'warehouse')
+      .where('batch.expiry_date IS NOT NULL')
+      .andWhere('batch.expiry_date <= :thirtyDaysLater', { thirtyDaysLater })
+      .andWhere('batch.expiry_date >= :today', { today })
+      .andWhere('batch.status = :status', { status: BatchStatus.ACTIVE });
+
+    if (warehouseId) {
+      queryBuilder.andWhere('batch.warehouse_id = :warehouseId', { warehouseId });
+    }
+
+    const batches = await queryBuilder.getMany();
+
+    const alerts: InventoryAlertItemDto[] = [];
+    for (const batch of batches) {
+      const expiryDate = new Date(batch.expiryDate);
+      const daysUntilExpiry = Math.ceil((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+      alerts.push({
+        batchId: batch.id,
+        batchNo: batch.batchNo,
+        rollNo: batch.rollNo,
+        warehouseId: batch.warehouseId,
+        warehouseName: '',
+        productId: batch.productId,
+        productName: '',
+        colorVariantId: batch.colorVariantId,
+        colorCode: '',
+        colorName: '',
+        currentQuantity: Number(batch.quantity),
+        threshold: 0,
+        diff: 0,
+        expiryDate: batch.expiryDate,
+        daysUntilExpiry,
+      });
+    }
+
+    return alerts;
+  }
+
+  /**
+   * 获取预警汇总
+   */
+  async getAlertSummary(warehouseId?: string): Promise<AlertSummaryDto> {
+    const lowStockAlerts = await this.getLowStockAlerts(warehouseId);
+    const overStockAlerts = await this.getOverStockAlerts(warehouseId);
+    const expiryAlerts = await this.getExpiryAlerts(warehouseId);
+
+    return {
+      lowStockCount: lowStockAlerts.length,
+      overStockCount: overStockAlerts.length,
+      expiryCount: expiryAlerts.length,
+      totalCount: lowStockAlerts.length + overStockAlerts.length + expiryAlerts.length,
     };
   }
 }

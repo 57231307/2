@@ -144,6 +144,13 @@ export class InventoryBatch extends BaseEntity {
   width: number;
 
   /**
+   * 有效期
+   * 用于效期预警
+   */
+  @Column({ type: 'date', name: 'expiry_date', nullable: true })
+  expiryDate: Date;
+
+  /**
    * 备注
    */
   @Column({ type: 'text', nullable: true })

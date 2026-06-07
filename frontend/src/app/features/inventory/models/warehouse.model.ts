@@ -1,4 +1,4 @@
-import { WarehouseType, WarehouseStatus } from '../../shared/enums/warehouse.enum';
+import { WarehouseType, WarehouseStatus } from '../../../shared/enums/warehouse.enum';
 
 export interface Warehouse {
   id: string;

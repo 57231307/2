@@ -61,4 +61,48 @@ export const PURCHASE_ROUTES: Routes = [
     loadComponent: () => import('./pages/return-form/return-form.component').then(m => m.ReturnFormComponent),
     title: '编辑退货单'
   },
+
+  // 供应商评估
+  {
+    path: 'evaluations',
+    loadComponent: () => import('./pages/supplier-evaluation-list/supplier-evaluation-list.component').then(m => m.SupplierEvaluationListComponent),
+    title: '供应商评估管理'
+  },
+  {
+    path: 'evaluations/new',
+    loadComponent: () => import('./pages/supplier-evaluation-form/supplier-evaluation-form.component').then(m => m.SupplierEvaluationFormComponent),
+    title: '新建供应商评估'
+  },
+  {
+    path: 'evaluations/:id',
+    loadComponent: () => import('./pages/supplier-evaluation-form/supplier-evaluation-form.component').then(m => m.SupplierEvaluationFormComponent),
+    title: '供应商评估详情'
+  },
+  {
+    path: 'evaluations/:id/edit',
+    loadComponent: () => import('./pages/supplier-evaluation-form/supplier-evaluation-form.component').then(m => m.SupplierEvaluationFormComponent),
+    title: '编辑供应商评估'
+  },
+
+  // 询价单
+  {
+    path: 'inquiry-list',
+    loadComponent: () => import('./pages/inquiry-list/inquiry-list.component').then(m => m.InquiryListComponent),
+    title: '询价单管理'
+  },
+  {
+    path: 'inquiry-list/create',
+    loadComponent: () => import('./pages/order-form/order-form.component').then(m => m.OrderFormComponent),
+    title: '新建询价单'
+  },
+  {
+    path: 'inquiry-list/:id',
+    loadComponent: () => import('./pages/order-form/order-form.component').then(m => m.OrderFormComponent),
+    title: '询价单详情'
+  },
+  {
+    path: 'inquiry-compare',
+    loadComponent: () => import('./pages/inquiry-compare/inquiry-compare.component').then(m => m.InquiryCompareComponent),
+    title: '询价单对比'
+  },
 ];

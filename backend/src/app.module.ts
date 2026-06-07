@@ -13,6 +13,7 @@ import { InventoryModule } from './modules/inventory/inventory.module';
 import { ProductionModule } from './modules/production/production.module';
 import { Product } from './modules/base-data/entities/product.entity';
 import { Customer } from './modules/base-data/entities/customer.entity';
+import { CustomerContact } from './modules/base-data/entities/customer-contact.entity';
 import { Supplier } from './modules/base-data/entities/supplier.entity';
 import { Warehouse } from './modules/base-data/entities/warehouse.entity';
 import { User } from './modules/system/entities/user.entity';
@@ -21,25 +22,30 @@ import { Permission } from './modules/system/entities/permission.entity';
 import { ProductColorVariant } from './modules/product/entities/product-color-variant.entity';
 import { Warehouse as InventoryWarehouse } from './modules/inventory/entities/warehouse.entity';
 import { InventoryBatch } from './modules/inventory/entities/inventory-batch.entity';
+import { InventoryTransfer } from './modules/inventory/entities/inventory-transfer.entity';
+import { InventoryTransferItem } from './modules/inventory/entities/inventory-transfer-item.entity';
 import { ProductionOrder } from './modules/production/entities/production-order.entity';
 import { ProductionOrderItem } from './modules/production/entities/production-order-item.entity';
 import { MaterialRequisition } from './modules/production/entities/material-requisition.entity';
 import { MaterialRequisitionItem } from './modules/production/entities/material-requisition-item.entity';
 import { ProductionReceipt } from './modules/production/entities/production-receipt.entity';
 import { ProductionReceiptItem } from './modules/production/entities/production-receipt-item.entity';
+import { ProcessReport } from './modules/production/entities/process-report.entity';
 import { SalesModule } from './modules/sales/sales.module';
-import { SaleOrder, SaleOrderItem, DeliveryNote, DeliveryNoteItem, SaleReturn } from './modules/sales/entities';
+import { SaleOrder, SaleOrderItem, DeliveryNote, DeliveryNoteItem, SaleReturn, SaleQuotation, SaleQuotationItem } from './modules/sales/entities';
 import { QualityModule } from './modules/quality/quality.module';
 import { QualityStandard, QualityInspection, QualityInspectionItem } from './modules/quality/entities';
 import { FinanceModule } from './modules/finance/finance.module';
 import { AccountReceivable, AccountPayable, Payment } from './modules/finance/entities';
 import { PurchaseModule } from './modules/purchase/purchase.module';
-import { PurchaseOrder, PurchaseOrderItem } from './modules/purchase/entities';
-import { GoodsReceipt, GoodsReceiptItem } from './modules/purchase/entities';
+import { PurchaseOrder, PurchaseOrderItem, GoodsReceipt, GoodsReceiptItem, PurchaseInquiry, PurchaseInquiryItem } from './modules/purchase/entities';
 import { ColorFormulaModule } from './modules/color-formula/color-formula.module';
-import { ColorFormula, ColorFormulaItem, ColorDifference } from './modules/color-formula/entities';
+import { ColorFormula, ColorFormulaItem, ColorDifference, ColorMatchingResult } from './modules/color-formula/entities';
 import { PatternModule } from './modules/pattern/pattern.module';
 import { Pattern, PatternCopyright } from './modules/pattern/entities';
+import { Department } from './modules/system/entities/department.entity';
+import { SystemParameter } from './modules/system/entities/system-parameter.entity';
+import { CodeRule } from './modules/system/entities/code-rule.entity';
 
 /**
  * 应用模块
@@ -92,6 +98,7 @@ import { Pattern, PatternCopyright } from './modules/pattern/entities';
         entities: [
           Product,
           Customer,
+          CustomerContact,
           Supplier,
           Warehouse,
           User,
@@ -100,17 +107,22 @@ import { Pattern, PatternCopyright } from './modules/pattern/entities';
           ProductColorVariant,
           InventoryWarehouse,
           InventoryBatch,
+          InventoryTransfer,
+          InventoryTransferItem,
           ProductionOrder,
           ProductionOrderItem,
           MaterialRequisition,
           MaterialRequisitionItem,
           ProductionReceipt,
           ProductionReceiptItem,
+          ProcessReport,
           SaleOrder,
           SaleOrderItem,
           DeliveryNote,
           DeliveryNoteItem,
           SaleReturn,
+          SaleQuotation,
+          SaleQuotationItem,
           QualityStandard,
           QualityInspection,
           QualityInspectionItem,
@@ -121,11 +133,17 @@ import { Pattern, PatternCopyright } from './modules/pattern/entities';
           PurchaseOrderItem,
           GoodsReceipt,
           GoodsReceiptItem,
+          PurchaseInquiry,
+          PurchaseInquiryItem,
           ColorFormula,
           ColorFormulaItem,
           ColorDifference,
+          ColorMatchingResult,
           Pattern,
           PatternCopyright,
+          Department,
+          SystemParameter,
+          CodeRule,
         ],
       }),
       inject: [ConfigService],

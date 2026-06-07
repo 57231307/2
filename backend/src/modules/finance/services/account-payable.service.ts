@@ -216,4 +216,158 @@ export class AccountPayableService {
     const seq = String(count + 1).padStart(4, '0');
     return `${prefix}${seq}`;
   }
+
+  /**
+   * 获取应付款账龄报表
+   * @param supplierId 可选的供应商ID筛选
+   * @returns 账龄分析报表数据
+   */
+  async getAgingReport(supplierId?: string): Promise<{
+    总金额: number;
+    账龄区间: Array<{ 区间: string; 金额: number; 占比: number; 笔数: number }>;
+    供应商分布: Array<{ 供应商名称: string; 金额: number; 占比: number }>;
+  }> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // 构建查询条件
+    const whereConditions: FindOptionsWhere<AccountPayable> = {
+      status: ArApStatus.PENDING,
+    };
+    if (supplierId) {
+      whereConditions.supplierId = supplierId;
+    }
+
+    // 查询所有未结清的应付款
+    const payables = await this.payableRepository.find({
+      where: whereConditions,
+    });
+
+    // 计算总金额
+    const 总金额 = payables.reduce((sum, p) => sum + Number(p.balance), 0);
+
+    // 账龄区间统计
+    const 账龄区间: Array<{ 区间: string; 金额: number; 占比: number; 笔数: number }> = [
+      { 区间: '0-30天', 金额: 0, 占比: 0, 笔数: 0 },
+      { 区间: '31-60天', 金额: 0, 占比: 0, 笔数: 0 },
+      { 区间: '61-90天', 金额: 0, 占比: 0, 笔数: 0 },
+      { 区间: '90天以上', 金额: 0, 占比: 0, 笔数: 0 },
+    ];
+
+    payables.forEach((p) => {
+      const dueDate = new Date(p.dueDate);
+      dueDate.setHours(0, 0, 0, 0);
+      const daysPastDue = Math.floor((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
+
+      const balance = Number(p.balance);
+      let index: number;
+
+      if (daysPastDue <= 0) {
+        index = 0; // 0-30天（未到期或刚到期）
+      } else if (daysPastDue <= 30) {
+        index = 0; // 0-30天
+      } else if (daysPastDue <= 60) {
+        index = 1; // 31-60天
+      } else if (daysPastDue <= 90) {
+        index = 2; // 61-90天
+      } else {
+        index = 3; // 90天以上
+      }
+
+      账龄区间[index].金额 += balance;
+      账龄区间[index].笔数 += 1;
+    });
+
+    // 计算占比
+    账龄区间.forEach((item) => {
+      item.占比 = 总金额 > 0 ? Math.round((item.金额 / 总金额) * 10000) / 100 : 0;
+    });
+
+    // 供应商分布统计
+    const supplierMap = new Map<string, { 金额: number; 名称: string }>();
+    payables.forEach((p) => {
+      const current = supplierMap.get(p.supplierId) || { 金额: 0, 名称: p.supplierName };
+      current.金额 += Number(p.balance);
+      supplierMap.set(p.supplierId, current);
+    });
+
+    const 供应商分布 = Array.from(supplierMap.entries())
+      .map(([id, data]) => ({
+        供应商名称: data.名称,
+        金额: data.金额,
+        占比: 总金额 > 0 ? Math.round((data.金额 / 总金额) * 10000) / 100 : 0,
+      }))
+      .sort((a, b) => b.金额 - a.金额);
+
+    return {
+      总金额,
+      账龄区间,
+      供应商分布,
+    };
+  }
+
+  /**
+   * 获取逾期预警列表
+   * @returns 逾期应付款预警信息
+   */
+  async getOverdueAlerts(): Promise<Array<{
+    id: string;
+    documentNo: string;
+    supplierName: string;
+    amount: number;
+    balance: number;
+    dueDate: Date;
+    overdueDays: number;
+    severity: 'warning' | 'danger' | 'critical';
+  }>> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // 查询所有未结清的应付款
+    const payables = await this.payableRepository.find({
+      where: { status: ArApStatus.PENDING },
+      order: { dueDate: 'ASC' },
+    });
+
+    const alerts: Array<{
+      id: string;
+      documentNo: string;
+      supplierName: string;
+      amount: number;
+      balance: number;
+      dueDate: Date;
+      overdueDays: number;
+      severity: 'warning' | 'danger' | 'critical';
+    }> = [];
+
+    payables.forEach((p) => {
+      const dueDate = new Date(p.dueDate);
+      dueDate.setHours(0, 0, 0, 0);
+      const daysPastDue = Math.floor((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
+
+      if (daysPastDue > 0) {
+        let severity: 'warning' | 'danger' | 'critical';
+        if (daysPastDue > 90) {
+          severity = 'critical';
+        } else if (daysPastDue > 60) {
+          severity = 'danger';
+        } else {
+          severity = 'warning';
+        }
+
+        alerts.push({
+          id: p.id,
+          documentNo: p.documentNo,
+          supplierName: p.supplierName,
+          amount: Number(p.amount),
+          balance: Number(p.balance),
+          dueDate: p.dueDate,
+          overdueDays: daysPastDue,
+          severity,
+        });
+      }
+    });
+
+    return alerts;
+  }
 }

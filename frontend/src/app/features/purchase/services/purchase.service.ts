@@ -21,6 +21,18 @@ import {
   Warehouse,
   Batch,
 } from '../models/purchase.model';
+import {
+  SupplierEvaluation,
+  SupplierEvaluationQueryParams,
+  SupplierAverageScores,
+} from '../models/supplier-evaluation.model';
+import {
+  询价单,
+  询价单查询参数,
+  询价单分页结果,
+  创建询价单参数,
+  询价单对比结果,
+} from '../models/purchase-inquiry.model';
 
 @Injectable({ providedIn: 'root' })
 export class PurchaseService {
@@ -137,6 +149,51 @@ export class PurchaseService {
     return this.http.delete<void>(`${this.baseUrl}/purchase-returns/${id}`);
   }
 
+  // ==================== 供应商评估 ====================
+
+  // 获取供应商评估列表
+  getSupplierEvaluations(params: SupplierEvaluationQueryParams): Observable<PageResult<SupplierEvaluation>> {
+    let httpParams = new HttpParams()
+      .set('page', params.page.toString())
+      .set('pageSize', params.pageSize.toString());
+    if (params.supplierId) httpParams = httpParams.set('supplierId', params.supplierId);
+    if (params.evaluator) httpParams = httpParams.set('evaluator', params.evaluator);
+    if (params.level) httpParams = httpParams.set('level', params.level);
+    if (params.evaluationDateFrom) httpParams = httpParams.set('evaluationDateFrom', params.evaluationDateFrom.toISOString());
+    if (params.evaluationDateTo) httpParams = httpParams.set('evaluationDateTo', params.evaluationDateTo.toISOString());
+    return this.http.get<PageResult<SupplierEvaluation>>(`${this.baseUrl}/supplier-evaluations`, { params: httpParams });
+  }
+
+  // 获取供应商评估详情
+  getSupplierEvaluation(id: string): Observable<SupplierEvaluation> {
+    return this.http.get<SupplierEvaluation>(`${this.baseUrl}/supplier-evaluations/${id}`);
+  }
+
+  // 创建供应商评估
+  createSupplierEvaluation(evaluation: Partial<SupplierEvaluation>): Observable<SupplierEvaluation> {
+    return this.http.post<SupplierEvaluation>(`${this.baseUrl}/supplier-evaluations`, evaluation);
+  }
+
+  // 更新供应商评估
+  updateSupplierEvaluation(id: string, evaluation: Partial<SupplierEvaluation>): Observable<SupplierEvaluation> {
+    return this.http.put<SupplierEvaluation>(`${this.baseUrl}/supplier-evaluations/${id}`, evaluation);
+  }
+
+  // 删除供应商评估
+  deleteSupplierEvaluation(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/supplier-evaluations/${id}`);
+  }
+
+  // 获取供应商的评分记录
+  getSupplierScores(supplierId: string): Observable<SupplierEvaluation[]> {
+    return this.http.get<SupplierEvaluation[]>(`${this.baseUrl}/supplier-evaluations/supplier/${supplierId}`);
+  }
+
+  // 获取供应商的平均评分
+  getSupplierAverageScores(supplierId: string): Observable<SupplierAverageScores> {
+    return this.http.get<SupplierAverageScores>(`${this.baseUrl}/supplier-evaluations/supplier/${supplierId}/average`);
+  }
+
   // ==================== 辅助接口 ====================
 
   // 获取供应商列表
@@ -173,5 +230,66 @@ export class PurchaseService {
     return this.http.get<number>(`${this.baseUrl}/purchase-orders/${orderId}/received-quantity`, {
       params: { colorVariantId },
     });
+  }
+
+  // ==================== 询价单 ====================
+
+  // 获取询价单列表
+  getInquiries(params: 询价单查询参数): Observable<询价单分页结果> {
+    let httpParams = new HttpParams()
+      .set('page', (params.page || 1).toString())
+      .set('limit', (params.pageSize || 20).toString());
+    if (params.supplierId) httpParams = httpParams.set('supplierId', params.supplierId);
+    if (params.status) httpParams = httpParams.set('status', params.status);
+    if (params.startDate) httpParams = httpParams.set('startDate', params.startDate);
+    if (params.endDate) httpParams = httpParams.set('endDate', params.endDate);
+    if (params.search) httpParams = httpParams.set('search', params.search);
+    return this.http.get<询价单分页结果>(`${this.baseUrl}/purchase-inquiries`, { params: httpParams });
+  }
+
+  // 获取询价单详情
+  getInquiry(id: string): Observable<询价单> {
+    return this.http.get<询价单>(`${this.baseUrl}/purchase-inquiries/${id}`);
+  }
+
+  // 创建询价单
+  createInquiry(inquiry: 创建询价单参数): Observable<询价单> {
+    return this.http.post<询价单>(`${this.baseUrl}/purchase-inquiries`, inquiry);
+  }
+
+  // 更新询价单
+  updateInquiry(id: string, inquiry: Partial<创建询价单参数>): Observable<询价单> {
+    return this.http.put<询价单>(`${this.baseUrl}/purchase-inquiries/${id}`, inquiry);
+  }
+
+  // 删除询价单
+  deleteInquiry(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/purchase-inquiries/${id}`);
+  }
+
+  // 对比询价单
+  compareInquiries(inquiryIds: string[]): Observable<询价单对比结果> {
+    return this.http.post<询价单对比结果>(`${this.baseUrl}/purchase-inquiries/compare`, { inquiryIds });
+  }
+
+  // ==================== 采购报表 ====================
+
+  // 获取采购汇总报表
+  getPurchaseSummaryReport(startDate: string, endDate: string): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/purchase-reports/summary`, {
+      params: { startDate, endDate }
+    });
+  }
+
+  // 获取采购明细报表
+  getPurchaseDetailReport(startDate: string, endDate: string): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/purchase-reports/detail`, {
+      params: { startDate, endDate }
+    });
+  }
+
+  // 获取供应商采购绩效报表
+  getSupplierPerformanceReport(supplierId: string): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/purchase-reports/supplier/${supplierId}`);
   }
 }

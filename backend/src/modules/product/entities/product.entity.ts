@@ -74,6 +74,20 @@ export class Product extends BaseEntity {
   defaultVariantId: string;
 
   /**
+   * 安全库存
+   * 当库存低于此值时触发低库存预警
+   */
+  @Column({ type: 'decimal', precision: 12, scale: 4, name: 'safe_stock', default: 0 })
+  safeStock: number;
+
+  /**
+   * 最高库存
+   * 当库存高于此值时触发超储预警
+   */
+  @Column({ type: 'decimal', precision: 12, scale: 4, name: 'max_stock', default: 0 })
+  maxStock: number;
+
+  /**
    * 颜色变体列表
    * 与ProductColorVariant是一对多关系
    */

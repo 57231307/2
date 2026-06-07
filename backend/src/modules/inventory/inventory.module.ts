@@ -2,13 +2,40 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Warehouse } from './entities/warehouse.entity';
 import { InventoryBatch } from './entities/inventory-batch.entity';
+import { InventoryCheck } from './entities/inventory-check.entity';
+import { InventoryCheckItem } from './entities/inventory-check-item.entity';
+import { InventoryTransfer } from './entities/inventory-transfer.entity';
+import { InventoryTransferItem } from './entities/inventory-transfer-item.entity';
 import { WarehouseService, BatchService } from './services/inventory.service';
+import { InventoryCheckService } from './services/inventory-check.service';
+import { InventoryTransferService } from './services/inventory-transfer.service';
 import { WarehouseController, BatchController, InventoryController } from './controllers/inventory.controller';
+import { InventoryCheckController } from './controllers/inventory-check.controller';
+import { InventoryAlertController } from './controllers/inventory-alert.controller';
+import { InventoryTransferController } from './controllers/inventory-transfer.controller';
+import { ProductModule } from '../product/product.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Warehouse, InventoryBatch])],
-  providers: [WarehouseService, BatchService],
-  controllers: [WarehouseController, BatchController, InventoryController],
-  exports: [TypeOrmModule, WarehouseService, BatchService],
+  imports: [
+    TypeOrmModule.forFeature([
+      Warehouse,
+      InventoryBatch,
+      InventoryCheck,
+      InventoryCheckItem,
+      InventoryTransfer,
+      InventoryTransferItem,
+    ]),
+    ProductModule,
+  ],
+  providers: [WarehouseService, BatchService, InventoryCheckService, InventoryTransferService],
+  controllers: [
+    WarehouseController,
+    BatchController,
+    InventoryController,
+    InventoryCheckController,
+    InventoryAlertController,
+    InventoryTransferController,
+  ],
+  exports: [TypeOrmModule, WarehouseService, BatchService, InventoryCheckService, InventoryTransferService],
 })
 export class InventoryModule {}

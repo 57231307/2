@@ -77,4 +77,30 @@ export class AccountReceivableController {
       data: result,
     };
   }
+
+  /**
+   * 获取应收款账龄报表
+   * GET /api/v1/account-receivables/aging-report
+   */
+  @Get('aging-report')
+  async getAgingReport(@Query('customerId') customerId?: string) {
+    const result = await this.receivableService.getAgingReport(customerId);
+    return {
+      success: true,
+      data: result,
+    };
+  }
+
+  /**
+   * 获取逾期预警列表
+   * GET /api/v1/account-receivables/overdue-alerts
+   */
+  @Get('overdue-alerts')
+  async getOverdueAlerts() {
+    const result = await this.receivableService.getOverdueAlerts();
+    return {
+      success: true,
+      data: result,
+    };
+  }
 }

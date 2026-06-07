@@ -77,4 +77,30 @@ export class AccountPayableController {
       data: result,
     };
   }
+
+  /**
+   * 获取应付款账龄报表
+   * GET /api/v1/account-payables/aging-report
+   */
+  @Get('aging-report')
+  async getAgingReport(@Query('supplierId') supplierId?: string) {
+    const result = await this.payableService.getAgingReport(supplierId);
+    return {
+      success: true,
+      data: result,
+    };
+  }
+
+  /**
+   * 获取逾期预警列表
+   * GET /api/v1/account-payables/overdue-alerts
+   */
+  @Get('overdue-alerts')
+  async getOverdueAlerts() {
+    const result = await this.payableService.getOverdueAlerts();
+    return {
+      success: true,
+      data: result,
+    };
+  }
 }

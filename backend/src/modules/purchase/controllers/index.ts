@@ -3,3 +3,5 @@
  */
 export * from './purchase-order.controller';
 export * from './goods-receipt.controller';
+export * from './supplier-evaluation.controller';
+export * from './purchase-inquiry.controller';

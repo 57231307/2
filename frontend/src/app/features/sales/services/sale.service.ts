@@ -16,6 +16,10 @@ import {
   DeliveryQueryParams,
   ReturnQueryParams,
   OrderStatus,
+  SaleQuotation,
+  SaleQuotationItem,
+  QuotationQueryParams,
+  QuotationStatus,
 } from '../models/sale.model';
 
 @Injectable({ providedIn: 'root' })
@@ -130,6 +134,56 @@ export class SaleService {
   // 删除退货单
   deleteReturn(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/sale-returns/${id}`);
+  }
+
+  // ==================== 报价单 ====================
+
+  // 获取报价单列表
+  getQuotations(params: QuotationQueryParams): Observable<PageResult<SaleQuotation>> {
+    let httpParams = new HttpParams()
+      .set('page', params.page.toString())
+      .set('pageSize', params.pageSize.toString());
+    if (params.keyword) httpParams = httpParams.set('search', params.keyword);
+    if (params.customerId) httpParams = httpParams.set('customerId', params.customerId);
+    if (params.status) httpParams = httpParams.set('status', params.status);
+    if (params.startDate) httpParams = httpParams.set('startDate', params.startDate.toISOString());
+    if (params.endDate) httpParams = httpParams.set('endDate', params.endDate.toISOString());
+    return this.http.get<PageResult<SaleQuotation>>(`${this.baseUrl}/sale-quotations`, { params: httpParams });
+  }
+
+  // 获取报价单详情
+  getQuotation(id: string): Observable<SaleQuotation> {
+    return this.http.get<SaleQuotation>(`${this.baseUrl}/sale-quotations/${id}`);
+  }
+
+  // 创建报价单
+  createQuotation(quotation: Partial<SaleQuotation>): Observable<SaleQuotation> {
+    return this.http.post<SaleQuotation>(`${this.baseUrl}/sale-quotations`, quotation);
+  }
+
+  // 更新报价单
+  updateQuotation(id: string, quotation: Partial<SaleQuotation>): Observable<SaleQuotation> {
+    return this.http.put<SaleQuotation>(`${this.baseUrl}/sale-quotations/${id}`, quotation);
+  }
+
+  // 确认报价单
+  confirmQuotation(id: string): Observable<SaleQuotation> {
+    return this.http.post<SaleQuotation>(`${this.baseUrl}/sale-quotations/${id}/confirm`, {});
+  }
+
+  // 报价单转订单
+  convertQuotationToOrder(id: string): Observable<SaleOrder> {
+    return this.http.post<SaleOrder>(`${this.baseUrl}/sale-quotations/${id}/convert-to-order`, {});
+  }
+
+  // 取消报价单
+  cancelQuotation(id: string): Observable<SaleQuotation> {
+    return this.http.post<SaleQuotation>(`${this.baseUrl}/sale-quotations/${id}/cancel`, {});
+  }
+
+  // 删除报价单
+  deleteQuotation(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/sale-quotations/${id}`);
   }
 
   // ==================== 辅助接口 ====================

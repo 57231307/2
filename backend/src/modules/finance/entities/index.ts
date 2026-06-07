@@ -4,3 +4,4 @@
 export * from './account-receivable.entity';
 export * from './account-payable.entity';
 export * from './payment.entity';
+export * from './cost-variance.entity';

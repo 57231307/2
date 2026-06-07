@@ -1,19 +1,20 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ColorFormulaController } from './controllers/color-formula.controller';
-import { ColorFormulaService } from './services/color-formula.service';
-import { ColorFormula, ColorFormulaItem, ColorDifference } from './entities';
+import { ColorFormulaController, ColorMatchingResultController } from './controllers';
+import { ColorFormulaService, ColorMatchingResultService } from './services';
+import { ColorFormula, ColorFormulaItem, ColorDifference, ColorMatchingResult } from './entities';
+import { Customer } from '../base-data/entities/customer.entity';
 
 /**
  * 颜色配方模块
- * 包含颜色配方管理、配方明细管理和色差检测功能
+ * 包含颜色配方管理、配方明细管理、色差检测和配色结果记录功能
  */
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ColorFormula, ColorFormulaItem, ColorDifference]),
+    TypeOrmModule.forFeature([ColorFormula, ColorFormulaItem, ColorDifference, ColorMatchingResult, Customer]),
   ],
-  controllers: [ColorFormulaController],
-  providers: [ColorFormulaService],
-  exports: [ColorFormulaService],
+  controllers: [ColorFormulaController, ColorMatchingResultController],
+  providers: [ColorFormulaService, ColorMatchingResultService],
+  exports: [ColorFormulaService, ColorMatchingResultService],
 })
 export class ColorFormulaModule {}
