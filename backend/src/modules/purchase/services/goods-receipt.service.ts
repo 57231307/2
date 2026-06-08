@@ -10,7 +10,7 @@ import { ReceiptStatus } from '../enums/receipt-status.enum';
 import { PurchaseOrderStatus } from '../enums/purchase-order-status.enum';
 import { InventoryBatch } from '../../inventory/entities/inventory-batch.entity';
 import { BatchSourceType, BatchStatus, QualityStatus } from '../../inventory/enums';
-import { Warehouse } from '../../inventory/entities/warehouse.entity';
+import { Warehouse } from '../../base-data/entities/warehouse.entity';
 import { CreateGoodsReceiptDto, CreateGoodsReceiptItemWithRollDto, QueryGoodsReceiptDto, GenerateBatchDto } from '../dto/goods-receipt.dto';
 
 /**

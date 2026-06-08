@@ -6,7 +6,7 @@ import { InventoryTransfer, TransferStatus } from '../entities/inventory-transfe
 import { InventoryTransferItem } from '../entities/inventory-transfer-item.entity';
 import { InventoryBatch } from '../entities/inventory-batch.entity';
 import { BatchStatus } from '../enums/batch-status.enum';
-import { Warehouse } from '../entities/warehouse.entity';
+import { Warehouse } from '../../base-data/entities/warehouse.entity';
 import { CreateTransferDto, QueryTransferDto, CancelTransferDto, TransferResponseDto, TransferItemResponseDto } from '../dto/inventory-transfer.dto';
 
 /**

@@ -6,7 +6,7 @@ import { PurchaseOrder } from '../entities/purchase-order.entity';
 import { PurchaseOrderStatus, ApprovalStatus } from '../enums/purchase-order-status.enum';
 import { PurchaseOrderItem } from '../entities/purchase-order-item.entity';
 import { Supplier } from '../../base-data/entities/supplier.entity';
-import { Product } from '../../base-data/entities/product.entity';
+import { Product } from '../../product/entities/product.entity';
 import { CreatePurchaseOrderDto, UpdatePurchaseOrderDto, QueryPurchaseOrderDto, ApprovePurchaseOrderDto } from '../dto/purchase-order.dto';
 
 /**

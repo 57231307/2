@@ -11,7 +11,7 @@ import { SupplierModule } from './modules/supplier/supplier.module';
 import { ProductModule } from './modules/product/product.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
 import { ProductionModule } from './modules/production/production.module';
-import { Product } from './modules/base-data/entities/product.entity';
+import { Product } from './modules/product/entities/product.entity';
 import { Customer } from './modules/base-data/entities/customer.entity';
 import { CustomerContact } from './modules/base-data/entities/customer-contact.entity';
 import { Supplier } from './modules/base-data/entities/supplier.entity';
@@ -20,7 +20,6 @@ import { User } from './modules/system/entities/user.entity';
 import { Role } from './modules/system/entities/role.entity';
 import { Permission } from './modules/system/entities/permission.entity';
 import { ProductColorVariant } from './modules/product/entities/product-color-variant.entity';
-import { Warehouse as InventoryWarehouse } from './modules/inventory/entities/warehouse.entity';
 import { InventoryBatch } from './modules/inventory/entities/inventory-batch.entity';
 import { InventoryTransfer } from './modules/inventory/entities/inventory-transfer.entity';
 import { InventoryTransferItem } from './modules/inventory/entities/inventory-transfer-item.entity';
@@ -105,7 +104,6 @@ import { CodeRule } from './modules/system/entities/code-rule.entity';
           Role,
           Permission,
           ProductColorVariant,
-          InventoryWarehouse,
           InventoryBatch,
           InventoryTransfer,
           InventoryTransferItem,

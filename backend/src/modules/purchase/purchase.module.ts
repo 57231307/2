@@ -9,9 +9,9 @@ import { GoodsReceiptItem } from './entities/goods-receipt-item.entity';
 import { SupplierEvaluation, SupplierEvaluationItem } from './entities';
 import { PurchaseInquiry, PurchaseInquiryItem } from './entities';
 import { Supplier } from '../base-data/entities/supplier.entity';
-import { Product } from '../base-data/entities/product.entity';
+import { Product } from '../product/entities/product.entity';
 import { InventoryBatch } from '../inventory/entities/inventory-batch.entity';
-import { Warehouse } from '../inventory/entities/warehouse.entity';
+import { Warehouse } from '../base-data/entities/warehouse.entity';
 
 /**
  * 采购模块

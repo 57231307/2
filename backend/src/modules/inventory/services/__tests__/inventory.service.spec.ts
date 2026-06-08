@@ -4,7 +4,7 @@ import { NotFoundException, ConflictException, BadRequestException } from '@nest
 import { Repository, Like, In } from 'typeorm';
 import { format } from 'date-fns';
 import { BatchService, WarehouseService } from '../inventory.service';
-import { Warehouse, WarehouseStatus } from '../../entities/warehouse.entity';
+import { Warehouse, WarehouseStatus, WarehouseType } from '../../../base-data/entities/warehouse.entity';
 import { InventoryBatch } from '../../entities/inventory-batch.entity';
 import { BatchSourceType } from '../../enums/batch-source-type.enum';
 import { BatchStatus } from '../../enums/batch-status.enum';

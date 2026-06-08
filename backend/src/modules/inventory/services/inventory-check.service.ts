@@ -6,7 +6,7 @@ import { InventoryCheck, InventoryCheckStatus, InventoryCheckType } from '../ent
 import { InventoryCheckItem } from '../entities/inventory-check-item.entity';
 import { InventoryBatch } from '../entities/inventory-batch.entity';
 import { BatchStatus } from '../enums/batch-status.enum';
-import { Warehouse } from '../entities/warehouse.entity';
+import { Warehouse } from '../../base-data/entities/warehouse.entity';
 
 /**
  * 创建盘点单DTO

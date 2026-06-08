@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Warehouse } from './entities/warehouse.entity';
+import { Warehouse } from '../base-data/entities/warehouse.entity';
 import { InventoryBatch } from './entities/inventory-batch.entity';
 import { InventoryCheck } from './entities/inventory-check.entity';
 import { InventoryCheckItem } from './entities/inventory-check-item.entity';
@@ -14,11 +14,11 @@ import { InventoryCheckController } from './controllers/inventory-check.controll
 import { InventoryAlertController } from './controllers/inventory-alert.controller';
 import { InventoryTransferController } from './controllers/inventory-transfer.controller';
 import { ProductModule } from '../product/product.module';
+import { BaseDataModule } from '../base-data/base-data.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
-      Warehouse,
       InventoryBatch,
       InventoryCheck,
       InventoryCheckItem,
@@ -26,6 +26,7 @@ import { ProductModule } from '../product/product.module';
       InventoryTransferItem,
     ]),
     ProductModule,
+    BaseDataModule,
   ],
   providers: [WarehouseService, BatchService, InventoryCheckService, InventoryTransferService],
   controllers: [

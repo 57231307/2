@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, Index, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity';
-import { Warehouse } from './warehouse.entity';
+import { Warehouse } from '../../base-data/entities/warehouse.entity';
 import { InventoryTransferItem } from './inventory-transfer-item.entity';
 
 /**

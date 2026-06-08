@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query, ParseUUIDPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { WarehouseService, BatchService } from '../services/inventory.service';
-import { Warehouse } from '../entities/warehouse.entity';
+import { Warehouse } from '../../base-data/entities/warehouse.entity';
 import { InventoryBatch } from '../entities/inventory-batch.entity';
 import { CreateWarehouseDto, UpdateWarehouseDto, QueryWarehouseDto } from '../dto/warehouse.dto';
 import { CreateBatchDto, UpdateBatchDto, QueryBatchDto } from '../dto/inventory-batch.dto';

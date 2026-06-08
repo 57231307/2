@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsString, IsEnum, IsOptional, MaxLength } from 'class-validator';
-import { WarehouseType } from '../enums/warehouse-type.enum';
+import { WarehouseType } from '../../base-data/entities/warehouse.entity';
 
 /**
  * 创建仓库DTO

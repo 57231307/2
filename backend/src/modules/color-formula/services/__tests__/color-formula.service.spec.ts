@@ -116,7 +116,10 @@ describe('ColorFormulaService', () => {
     it('应该成功创建配方和明细', async () => {
       const createData = {
         name: '测试红色配方',
-        items: [{ materialId: 'mat-1', materialName: '红色染料', percentage: 80.0 }],
+        labL: 45.5,
+        labA: 70.2,
+        labB: 25.3,
+        items: [{ materialId: 'mat-1', materialName: '红色染料', materialCode: 'RED-001', percentage: 80.0, weight: 800.0 }],
       };
 
       formulaRepository.findOne.mockResolvedValue(null);
@@ -147,7 +150,13 @@ describe('ColorFormulaService', () => {
       formulaRepository.findOne.mockResolvedValue(mockFormula);
 
       await expect(
-        service.create({ code: 'CF202401010001', name: '重复编码配方' }),
+        service.create({
+          code: 'CF202401010001',
+          name: '重复编码配方',
+          labL: 45.5,
+          labA: 70.2,
+          labB: 25.3,
+        }),
       ).rejects.toThrow(ConflictException);
     });
   });

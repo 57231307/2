@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, ConflictException, BadRequestException }
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like, In, LessThanOrEqual, MoreThanOrEqual, Between } from 'typeorm';
 import { format, addDays } from 'date-fns';
-import { Warehouse, WarehouseStatus } from '../entities/warehouse.entity';
+import { Warehouse, WarehouseStatus, WarehouseType } from '../../base-data/entities/warehouse.entity';
 import { InventoryBatch } from '../entities/inventory-batch.entity';
 import { BatchSourceType } from '../enums/batch-source-type.enum';
 import { BatchStatus } from '../enums/batch-status.enum';
